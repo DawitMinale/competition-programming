@@ -1,0 +1,8 @@
+class Solution:
+    def sortSentence(self, s: str) -> str:
+        words = s.split()
+        answer = [True] * len(words)
+        for word in words:
+            length = len(word)
+            answer[int(word[length - 1]) - 1] = word[0: length - 1]
+        return " ".join(answer)
