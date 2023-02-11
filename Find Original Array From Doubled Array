@@ -1,21 +1,29 @@
-def solution(changed: List[int]) -> List[int]:
-	if len(changed) % 2 != 0:
-		return []
-	changed.sort()
-	seen = [False] * len(changed)
-	res = []
-	# i will move right from the smallest number
-	# j will point to the last double we used
-	i = j = 0
-	for _ in range(len(changed) // 2):
-		while seen[i]:
-			i += 1
-		# since we always use the left-most index i
-		# searching after i prevents reusing a number
-		j = bisect_left(changed, changed[i] * 2, lo=max(i, j) + 1)
-		if j >= len(changed) or changed[i] * 2 != changed[j]:
-			return []
-		seen[j] = True
-		res.append(changed[i])
-		i += 1
-	return res
+class Solution:
+    def findOriginalArray(self, changed: List[int]) -> List[int]:
+        counter = collections.Counter(changed)
+        res = []
+        for k in counter.keys():
+            
+            if k == 0:
+                # handle zero as special case
+                if counter[k] % 2 > 0:
+                    return []
+                res += [0] * (counter[k] // 2)
+                
+            elif counter[k] > 0:
+                x = k
+                
+                # walk down the chain
+                while x % 2 == 0 and x // 2 in counter:
+                    x = x // 2
+                    
+                # walk up and process all numbers within the chain. mark the counts as 0
+                while x in counter:
+                    if counter[x] > 0:
+                        res += [x] * counter[x]
+                        if counter[x+x] < counter[x]:
+                            return []
+                        counter[x+x] -= counter[x]
+                        counter[x] = 0
+                    x += x
+        return res
