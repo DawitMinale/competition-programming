@@ -1,0 +1,21 @@
+def solution(changed: List[int]) -> List[int]:
+	if len(changed) % 2 != 0:
+		return []
+	changed.sort()
+	seen = [False] * len(changed)
+	res = []
+	# i will move right from the smallest number
+	# j will point to the last double we used
+	i = j = 0
+	for _ in range(len(changed) // 2):
+		while seen[i]:
+			i += 1
+		# since we always use the left-most index i
+		# searching after i prevents reusing a number
+		j = bisect_left(changed, changed[i] * 2, lo=max(i, j) + 1)
+		if j >= len(changed) or changed[i] * 2 != changed[j]:
+			return []
+		seen[j] = True
+		res.append(changed[i])
+		i += 1
+	return res
