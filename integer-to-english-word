@@ -1,0 +1,33 @@
+class Solution:
+    def numberToWords(self, num: int) -> str:
+        
+        if num == 0 : return "Zero"                               # [1] trivial case
+        
+        # here is a collection of English words with correct indices, e.g, ones[1] = "One"
+        mils = ["", "Thousand", "Million", "Billion"]
+        ones = ["", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine"]
+        tens = ["", "", "Twenty", "Thirty", "Forty", "Fifty", "Sixty", "Seventy", "Eighty", "Ninety"]
+        teen = ["Ten", "Eleven", "Twelve", "Thirteen", "Fourteen"] + [t[0:-2] + "teen" for t in tens[5:]]
+        
+        def helper(cs: int) -> str:                               # [2] this helper function processes
+            ss = []                                               #     independent 3-digit chunks
+            
+            if cs[2] != 0 : ss.append(ones[cs[2]] + " Hundred")   # [3] hundreds are treated separately
+            
+            if   cs[1] == 0 : ss.append(ones[cs[0]])              # [4] main stuff happens here,
+            elif cs[1] == 1 : ss.append(teen[cs[0]])              #     namely, we check for 'tens'
+            else : ss.extend([tens[cs[1]], ones[cs[0]]])          #     and then decide one 'ones'
+                
+            return " ".join(ss).replace("  ", "").strip()
+            
+        digits = []                                               # [5] collect up to 12 digits
+        for _ in range(12):
+            num, d = divmod(num, 10)
+            digits.append(d)
+        
+        s = []
+        for m, i in zip(mils, range(0, len(digits), 3)):           # [6] split digits in chunks of 3
+            d = digits[i:i+3]                                      #     and process them separately,
+            if sum(d) != 0 : s.append(f"{helper(d)} {m}")
+        
+        return " ".join(s[::-1]).strip()                           # [7] join 3-digit chunks 
